@@ -19,6 +19,7 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const { name } = require('ejs');
 
 const dbUrl = process.env.ATLASDB_URL;
 
@@ -53,16 +54,20 @@ store.on("error", () =>{
     console.log("ERROR in MONGO SESSION STORE", err);
 });
 
+app.set("trust proxy", 1);
+
 const sessionOptions = {
     store,
+    name:"wanderlust-session",
     secret:process.env.SECRET,
     resave: false,
-    saveUninitialized:true,
+    saveUninitialized:false,
     cookie:{
         httpOnly: true,
+        secure:process.env.NODE_ENV === "production",
         expires:Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        // secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
     }
 };
 
